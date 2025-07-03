@@ -1,0 +1,35 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    services:
+      backend:
+        image: python:3.10
+        env:
+          SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
+          SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
+        ports: ['5000:5000']
+        options: --health-cmd "curl http://localhost:5000/ || exit 1" --health-interval 10s
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Test Frontend
+        working-directory: frontend
+        run: npm ci && npm run build
+
+      - name: Build Backend
+        working-directory: backend
+        run: pip install -r required.txt
+
+      - name: Build and Push Docker Images
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: false
+          tags: moodmusic/app:latest

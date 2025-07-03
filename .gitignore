@@ -1,0 +1,26 @@
+# Node
+frontend-react/node_modules/
+frontend-react/dist/
+frontend-react/.env.local
+
+# Python
+backend-flask/__pycache__/
+backend-flask/.venv/
+backend-flask/env/
+backend-flask/*.pyc
+
+# General
+.env
+*.log
+.DS_Store
+.vscode/
+.idea/
+
+# Docker
+**/Dockerfile
+**/.dockerignore
+
+# System
+*.swp
+*.bak
+*.tmp
