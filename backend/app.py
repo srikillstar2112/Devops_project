@@ -2,44 +2,27 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from textblob import TextBlob
 from spotify import get_song_for_mood
-from dotenv import load_dotenv
-import os
-
-# Load environment variables from .env file
-load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
 
-# ✅ Demo login endpoint
-@app.route('/api/login', methods=['POST'])
-def login():
-    data = request.json
-    email = data.get('email')
-    password = data.get('password')
+@app.route("/analyze", methods=["POST"])
+def analyze_mood():
+    data = request.get_json()
+    text = data.get("text", "")
 
-    if email == os.getenv('DEMO_EMAIL') and password == os.getenv('DEMO_PASS'):
-        return jsonify({"status": "ok"}), 200
-    return jsonify({"status": "fail", "message": "Invalid credentials"}), 401
+    if not text.strip():
+        return jsonify({"status": "error", "message": "Invalid input"}), 400
 
-@app.route('/api/analyze', methods=['POST'])
-def analyze():
-    data = request.json
-    mood_text = data.get('mood', '')
+    polarity = TextBlob(text).sentiment.polarity
+    song = get_song_for_mood(polarity)
 
-    if not mood_text.strip():
-        return jsonify({"error": "Mood text is required"}), 400
+    return jsonify({"status": "ok", "song": song})
 
-    # Sentiment analysis
-    blob = TextBlob(mood_text)
-    polarity = blob.sentiment.polarity
 
-    try:
-        # Get song based on polarity
-        song = get_song_for_mood(polarity)
-        return jsonify(song)
-    except Exception as e:
-        return jsonify({"error": "Failed to get song", "details": str(e)}), 500
+@app.route("/")
+def home():
+    return "Moodymusic backend is running 🚀"
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+if __name__ == "__main__":
+    app.run(debug=True)

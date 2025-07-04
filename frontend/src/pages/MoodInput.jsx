@@ -1,38 +1,44 @@
-import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import '../styles/styles.css';
 
-export default function MoodInput() {
-  const [mood, setMood] = useState('')
-  const nav = useNavigate()
+function MoodInput() {
+  const [mood, setMood] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
-  async function analyze() {
-    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/analyze`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ mood })
-    })
-    const data = await res.json()
-    window.sessionStorage.setItem('suggestion', JSON.stringify(data))
-    nav('/recommendation')
-  }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!mood.trim()) {
+      setError("Please enter your mood");
+      return;
+    }
+
+    const res = await fetch("http://localhost:5000/api/analyze", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ mood }),
+    });
+
+    const data = await res.json();
+    localStorage.setItem("song", JSON.stringify(data));
+    navigate("/recommendation");
+  };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center px-4">
-      <div className="bg-white shadow-lg rounded-lg p-8 max-w-xl w-full">
-        <h2 className="text-3xl font-bold text-center mb-6 text-gray-800">How are you feeling today?</h2>
+    <div className="card">
+      <h2>What's Your Mood?</h2>
+      <form onSubmit={handleSubmit}>
         <textarea
-          rows="4"
-          className="w-full border border-gray-300 rounded p-4 focus:outline-none focus:ring-2 focus:ring-blue-400 mb-4"
-          placeholder="Type your mood..."
           value={mood}
-          onChange={e => setMood(e.target.value)}
+          onChange={(e) => setMood(e.target.value)}
+          placeholder="Describe how you're feeling..."
         />
-        <button
-          onClick={analyze}
-          className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-300">
-          Get a song 🔥
-        </button>
-      </div>
+        {error && <p className="text-red-500 text-sm">{error}</p>}
+        <button type="submit">Analyze Mood</button>
+      </form>
     </div>
-  )
+  );
 }
+
+export default MoodInput;

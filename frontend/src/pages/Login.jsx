@@ -1,50 +1,52 @@
-import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import '../styles/styles.css';
 
-export default function Login() {
-  const [email, setEmail] = useState('')
-  const [pass, setPass] = useState('')
-  const [err, setErr] = useState('')
-  const nav = useNavigate()
+function Login() {
+  const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
-  async function onSubmit(e) {
-    e.preventDefault()
-    const res = await fetch('http://localhost:5000/api/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password: pass })
-    })
-    if (res.ok) nav('/mood')
-    else {
-      const data = await res.json()
-      setErr(data.message)
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const res = await fetch("http://localhost:5000/api/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+
+    const data = await res.json();
+    if (data.status === "ok") {
+      navigate("/mood");
+    } else {
+      setError("Invalid email or password");
     }
-  }
+  };
 
   return (
-     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-      <div className="bg-white p-8 shadow-md rounded w-full max-w-md">
-        <h2 className="text-2xl font-semibold mb-6">Login to Moodymusic</h2>
+    <div className="card">
+      <h2>Login to Moodymusic</h2>
+      <form onSubmit={handleSubmit}>
+        <label>Email</label>
         <input
           type="email"
-          placeholder="Email"
-          className="w-full p-3 border rounded mb-4"
           value={email}
-          onChange={e => setEmail(e.target.value)}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="you@example.com"
         />
+        <label>Password</label>
         <input
           type="password"
-          placeholder="Password"
-          className="w-full p-3 border rounded mb-4"
           value={password}
-          onChange={e => setPassword(e.target.value)}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="••••••••"
         />
-        <button
-          onClick={handleLogin}
-          className="w-full bg-blue-600 text-white py-3 rounded hover:bg-blue-700 transition">
-          Login
-        </button>
-      </div>
+        {error && <p className="text-red-500 text-sm">{error}</p>}
+        <button type="submit">Login</button>
+      </form>
     </div>
-  )
+  );
 }
+
+export default Login;

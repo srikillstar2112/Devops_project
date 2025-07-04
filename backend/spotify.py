@@ -1,9 +1,9 @@
 from dotenv import load_dotenv
-load_dotenv()
-
 import os
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
+
+load_dotenv()
 
 client = spotipy.Spotify(auth_manager=SpotifyClientCredentials(
     client_id=os.getenv("SPOTIPY_CLIENT_ID"),
@@ -12,14 +12,15 @@ client = spotipy.Spotify(auth_manager=SpotifyClientCredentials(
 
 def get_song_for_mood(polarity):
     if polarity > 0.2:
-        query = "happy"
+        query = "happy upbeat"
     elif polarity < -0.2:
-        query = "sad"
+        query = "sad emotional"
     else:
-        query = "calm"
+        query = "calm chill"
 
     results = client.search(q=query, type="track", limit=1)
-    track = results['tracks']['items'][0]
+    track = results["tracks"]["items"][0]
+
     return {
         "name": track["name"],
         "artist": track["artists"][0]["name"],

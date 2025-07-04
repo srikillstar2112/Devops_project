@@ -1,26 +1,47 @@
-import React from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import React, { useContext } from "react";
+import { NavLink } from "react-router-dom";
+import { ThemeContext } from "../context/ThemeContext";
+import "../styles/styles.css";
 
-const links = [
-  { to: '/mood', label: 'Mood' },
-  { to: '/history', label: 'History' },
-]
+function Navbar() {
+  const { darkMode, toggleTheme } = useContext(ThemeContext);
 
-export default function Navbar() {
-  const loc = useLocation()
   return (
-    <nav className="bg-indigo-600 text-white py-3">
-      <div className="max-w-xl mx-auto flex justify-between items-center">
-        <Link to="/" className="text-xl font-bold">MoodMusic</Link>
-        <div className="space-x-4">
-          {links.map(l => (
-            <Link key={l.to} to={l.to}
-              className={`hover:underline ${loc.pathname === l.to ? 'underline' : ''}`}>
-              {l.label}
-            </Link>
-          ))}
-        </div>
+    <nav className="navbar">
+      <h2 className="logo">Moodymusic</h2>
+
+      <div className="nav-links">
+        <NavLink
+          to="/"
+          className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}
+        >
+          Login
+        </NavLink>
+        <NavLink
+          to="/mood"
+          className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}
+        >
+          Mood
+        </NavLink>
+        <NavLink
+          to="/recommendation"
+          className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}
+        >
+          Recommendation
+        </NavLink>
+        <NavLink
+          to="/history"
+          className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}
+        >
+          History
+        </NavLink>
       </div>
+
+      <button className="theme-toggle" onClick={toggleTheme}>
+        {darkMode ? "🌙" : "☀️"}
+      </button>
     </nav>
-  )
+  );
 }
+
+export default Navbar;
